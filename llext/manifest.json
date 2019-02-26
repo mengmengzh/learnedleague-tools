@@ -1,0 +1,13 @@
+{
+	"name": "LearnedLeague 1DS Stats Extension",
+	"version": "1",
+	"description": "Add some extra stats for LearnedLeague 1DS results.",
+	"manifest_version": 2,
+	"permissions": [ "storage", "webRequest", "https://*.learnedleague.com/" ],
+	"background": {"scripts": ["background.js"]},
+	"content_scripts": [ {
+		"js": [ "jquery-3.3.1.min.js", "content.js"],
+		"css": [ "content.css"],
+		"matches": [ "https://*.learnedleague.com/oneday.php?*"]
+	}]
+}
