@@ -6,3 +6,7 @@ Experimental repo for [Learned League](http://www.learnedleague.com) related too
 
 Unpack all files somewhere and follow instructions at https://developer.chrome.com/extensions/getstarted for loading a development
 Chrome extension.
+
+### Caveats
+
+The extension is very dependent on the specific way LL results pages are coded right now.
