@@ -1,5 +1,15 @@
-span.best
-{
+span.best {
 	color: blue !important;
+}
+span.best.better {
+	color: red !important;
 	font-weight: bold !important;
+}
+tr.llext {
+	border-top: 0;
+	border-collapse: collapse;
+}
+tr.llext td {
+	border-top: 0 !important;
+	border-collapse: collapse;
 }
