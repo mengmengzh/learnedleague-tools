@@ -4,12 +4,6 @@
 	"description": "Add some extra stats for LearnedLeague 1DS results.",
 	"manifest_version": 2,
 	"permissions": [ "declarativeContent", "storage", "webRequest", "https://*.learnedleague.com/" ],
-	/*
-	"options_ui": {
-		"page": "options.html",
-		"open_in_tab": false
-	},
-	*/
 	"page_action": {
 		"default_title": "LL 1DS Stats",
 		"default_icon": "l32.png",
