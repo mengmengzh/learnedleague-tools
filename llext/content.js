@@ -102,6 +102,8 @@ function doCalc()
 							llclass += ' better';
 						}
 						$(this).html('<span class="llext '+llclass+'">'+bestQsPoints[qCounter]+'</span>');
+					} else if($(this).hasClass('u')) {
+						$(this).html('<span class="llext worse">15</span>');
 					}
 					qCounter++;
 				}
