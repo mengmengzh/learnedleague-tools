@@ -5,6 +5,9 @@ span.best.better {
 	color: red !important;
 	font-weight: bold !important;
 }
+span.worse {
+	color: gray !important;
+}
 tr.llext {
 	border-top: 0;
 	border-collapse: collapse;
