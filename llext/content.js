@@ -15,6 +15,10 @@ chrome.storage.local.get({
 	doAll = items.doAll;
 	doCalc();
 });
+
+// fire off PageAction
+chrome.runtime.sendMessage({enableAddon: true});
+
 // initialize upon first page load, also add listener for ajax requests within page
 chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
 	console.log(sender.tab ?
