@@ -1,5 +1,9 @@
 # Change Log
 
+## 0.0.5 2019-04-21
+- Fix same-points preference issue
+- Convert vars to lets
+
 ## 0.0.4 2019-04-06
 - Rework to make source compatible with Firefox
 

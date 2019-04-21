@@ -1,6 +1,6 @@
 // Saves options to chrome.storage
 function save_options() {
-  var doAll = document.getElementById('doAll').value;
+  let doAll = document.getElementById('doAll').value;
   chrome.storage.local.set({
     doAll: doAll
   }, function() {

@@ -1,14 +1,14 @@
 // Grab the logged in user from the welcome message
-var welcomeSpan = $('span:contains("Welcome,")').text();
-var welcomeMatch = welcomeSpan.match(/Welcome, (.*)\!/);
-var currUser;
+let welcomeSpan = $('span:contains("Welcome,")').text();
+let welcomeMatch = welcomeSpan.match(/Welcome, (.*)\!/);
+let currUser;
 if (welcomeMatch)
 {
 	currUser = welcomeMatch[1];
 }
 
 
-var doAll;
+let doAll;
 chrome.storage.local.get({
 	doAll: 0
 }, function(items) {
@@ -48,10 +48,10 @@ function doCalc()
 {
 	$('.llext').remove();
 	// grab the row with question percentages and store the percentages
-	var pctsRow = $('td.std-head-mid:contains("% incorrect:")').parent();
-	var qPcts = [];
-	var qCounter = 0;
-	var tdCounter = 0;
+	let pctsRow = $('td.std-head-mid:contains("% incorrect:")').parent();
+	let qPcts = [];
+	let qCounter = 0;
+	let tdCounter = 0;
 	pctsRow.children().each(function() {
 		tdCounter++;
 		if(tdCounter >= 2 && tdCounter <= 13) {
@@ -59,33 +59,34 @@ function doCalc()
 			qCounter++;
 		}
 	});
-	var resTable = pctsRow.closest('table');
+	let resTable = pctsRow.closest('table');
 	resTable.find('tr').each(function() {
 		// only calculating for current user for now
 		if((doAll === "1")|| (currUser && $(this).hasClass(currUser))) {
 			if($(this).find('td').has('a').length == 0) {
 				return;
 			}
-			var potentialPoints = new Array();
+			let potentialPoints = new Array();
 			qCounter = 0;
 			// go through user's results and add up potential money values for each correct answer
 			$(this).children().each(function() {
 				if($(this).hasClass('bb')) {
 					if($(this).hasClass('omg')) {
-						potentialPoints.push({q:qCounter, points: 15 + qPcts[qCounter]});
+						let selected = $(this).hasClass('u') ? 1 : 0;
+						potentialPoints.push({q:qCounter, points: 15 + qPcts[qCounter], sel: selected});
 					}
 					qCounter++;
 				}
 			});
 			potentialPoints.sort(function(a,b) {
-				return b.points-a.points
+				return b.points !== a.points ? b.points-a.points : b.sel - a.sel;
 			});
-			var bestQs = new Array();
-			var bestQsPoints = new Array();
-			var bestScore = 0;
+			let bestQs = new Array();
+			let bestQsPoints = new Array();
+			let bestScore = 0;
 
 			// calculate best possible score and store best five questions for later
-			for(var iter = 0; iter < potentialPoints.length; iter++) {
+			for(let iter = 0; iter < potentialPoints.length; iter++) {
 				if(iter < 5) {
 					bestQs.push(potentialPoints[iter].q);
 					bestScore += potentialPoints[iter].points;
@@ -95,13 +96,13 @@ function doCalc()
 				}
 			}
 			qCounter = 0;
-			var doneTot = false;
-			var newRow = $(this).clone();
+			let doneTot = false;
+			let newRow = $(this).clone();
 			newRow.addClass('llext');
 			newRow.children().each(function() {
 				if($(this).hasClass('bb')) {
 					if($.inArray(qCounter,bestQs) >= 0) {
-						var llclass = "best";
+						let llclass = "best";
 						if(bestQsPoints[qCounter] > $(this).text()*1) {
 							llclass += ' better';
 						}
@@ -112,7 +113,7 @@ function doCalc()
 					qCounter++;
 				}
 				else if($(this).hasClass('ot') && !doneTot) {
-					var llclass = "best";
+					let llclass = "best";
 					if(bestScore > $(this).text()*1) {
 							llclass += ' better';
 					}
