@@ -4,8 +4,10 @@ Experimental repo for [Learned League](http://www.learnedleague.com) related too
 
 ### Installing
 
-Unpack all files somewhere and follow instructions at https://developer.chrome.com/extensions/getstarted for loading a development
-Chrome extension.
+Unpack all files somewhere and follow instructions at
+https://developer.chrome.com/extensions/getstarted for loading a development
+Chrome extension. The extension is also available now on the Chrome web store
+as well as a signed XPI on the [releases](https://github.com/mengmengzh/learnedleague-tools/releases) page.
 
 ### Caveats
 

@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.0.5.1 2019-04-23
+- Removed unnecessary permissions from manifest
+
 ## 0.0.5 2019-04-21
 - Fix same-points preference issue
 - Convert vars to lets
