@@ -1,5 +1,8 @@
 # Change Log
 
+## 0.0.6 2023-09-29
+- Removed jQuery dependency, update to manifest v3
+
 ## 0.0.5.1 2019-04-23
 - Removed unnecessary permissions from manifest
 
