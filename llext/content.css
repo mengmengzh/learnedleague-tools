@@ -1,11 +1,11 @@
-span.best {
+span.llext-best {
 	color: blue !important;
 }
-span.best.better {
+span.llext-best.llext-better {
 	color: red !important;
 	font-weight: bold !important;
 }
-span.worse {
+span.llext-worse {
 	color: gray !important;
 }
 tr.llext {

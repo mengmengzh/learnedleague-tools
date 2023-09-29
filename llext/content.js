@@ -1,130 +1,147 @@
 // Grab the logged in user from the welcome message
-let welcomeSpan = $('span:contains("Welcome,")').text();
-let welcomeMatch = welcomeSpan.match(/Welcome, (.*)\!/);
-let currUser;
-if (welcomeMatch)
-{
-	currUser = welcomeMatch[1];
+let currUser = null;
+for (const span of document.querySelectorAll('span')) {
+	const match = span.textContent.match(/Welcome, (.*)\!/);
+	if (match) {
+		currUser = match[1];
+		break;
+	};
 }
 
 
 let doAll;
 chrome.storage.local.get({
 	doAll: 0
-}, function(items) {
+}, function (items) {
 	doAll = items.doAll;
 	doCalc();
 });
 
 // fire off PageAction
-chrome.runtime.sendMessage({enableAddon: true});
+chrome.runtime.sendMessage({ enableAddon: true });
 
 // initialize upon first page load, also add listener for ajax requests within page
-chrome.runtime.onMessage.addListener(function(request, sender, sendResponse) {
-	console.log(sender.tab ?
-		"from a content script:" + sender.tab.url :
-		"from the extension");
-	if (request.greeting == "loaded")
-	{
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+	if (request.greeting == "loaded") {
 		chrome.storage.local.get({
 			doAll: 0
-		}, function(items) {
+		}, function (items) {
 			doAll = items.doAll;
 			doCalc();
 		});
 	}
-	sendResponse({farewell: "goodbye"});
+	sendResponse({ farewell: "goodbye" });
 });
-chrome.storage.onChanged.addListener(function(changes, namespace) {
-   for(key in changes) {
-     if(key === 'doAll') {
-	     doAll = changes[key].newValue;
-	     doCalc();
-     }
-   }
- });
+chrome.storage.onChanged.addListener(function (changes, namespace) {
+	for (key in changes) {
+		if (key === 'doAll') {
+			doAll = changes[key].newValue;
+			doCalc();
+		}
+	}
+});
 
-function doCalc()
-{
-	$('.llext').remove();
+function doCalc() {
+	for (const llRow of document.querySelectorAll('.llext')) {
+		llRow.parentNode.removeChild(llRow);
+	}
+
 	// grab the row with question percentages and store the percentages
-	let pctsRow = $('td.std-head-mid:contains("% incorrect:")').parent();
+	let pctsRow = null;
+	for (const row of document.querySelectorAll('td.std-head-mid')) {
+		if (row.textContent.includes('% incorrect:')) {
+			pctsRow = row.parentNode;
+		}
+	}
+	if (!pctsRow) {
+		return;
+	}
 	let qPcts = [];
 	let qCounter = 0;
-	let tdCounter = 0;
-	pctsRow.children().each(function() {
-		tdCounter++;
-		if(tdCounter >= 2 && tdCounter <= 13) {
-			qPcts[qCounter] = $(this).text()*1;
-			qCounter++;
+	for (let i = 1; i < Math.min(pctsRow.childNodes.length, 13); i++) {
+		qPcts[i - 1] = Number(pctsRow.childNodes[i].textContent);
+	}
+	const resTable = pctsRow.closest('table');
+	if (!resTable) {
+		return;
+	}
+	for (const resRow of resTable.querySelectorAll('tr')) {
+		if ((doAll !== "1") && (!currUser || !resRow.classList.contains(currUser))) {
+			continue;
 		}
-	});
-	let resTable = pctsRow.closest('table');
-	resTable.find('tr').each(function() {
-		// only calculating for current user for now
-		if((doAll === "1")|| (currUser && $(this).hasClass(currUser))) {
-			if($(this).find('td').has('a').length == 0) {
-				return;
-			}
-			let potentialPoints = new Array();
-			qCounter = 0;
-			// go through user's results and add up potential money values for each correct answer
-			$(this).children().each(function() {
-				if($(this).hasClass('bb')) {
-					if($(this).hasClass('omg')) {
-						let selected = $(this).hasClass('u') ? 1 : 0;
-						potentialPoints.push({q:qCounter, points: 15 + qPcts[qCounter], sel: selected});
-					}
-					qCounter++;
-				}
-			});
-			potentialPoints.sort(function(a,b) {
-				return b.points !== a.points ? b.points-a.points : b.sel - a.sel;
-			});
-			let bestQs = new Array();
-			let bestQsPoints = new Array();
-			let bestScore = 0;
-
-			// calculate best possible score and store best five questions for later
-			for(let iter = 0; iter < potentialPoints.length; iter++) {
-				if(iter < 5) {
-					bestQs.push(potentialPoints[iter].q);
-					bestScore += potentialPoints[iter].points;
-					bestQsPoints[potentialPoints[iter].q] = potentialPoints[iter].points;
-				} else {
-					bestScore += 15;
-				}
-			}
-			qCounter = 0;
-			let doneTot = false;
-			let newRow = $(this).clone();
-			newRow.addClass('llext');
-			newRow.children().each(function() {
-				if($(this).hasClass('bb')) {
-					if($.inArray(qCounter,bestQs) >= 0) {
-						let llclass = "best";
-						if(bestQsPoints[qCounter] > $(this).text()*1) {
-							llclass += ' better';
-						}
-						$(this).html('<span class="llext '+llclass+'">'+bestQsPoints[qCounter]+'</span>');
-					} else if($(this).hasClass('u')) {
-						$(this).html('<span class="llext worse">15</span>');
-					}
-					qCounter++;
-				}
-				else if($(this).hasClass('ot') && !doneTot) {
-					let llclass = "best";
-					if(bestScore > $(this).text()*1) {
-							llclass += ' better';
-					}
-					$(this).html('<span class="llext ' + llclass+'">'+bestScore+'</span>');
-					doneTot = true;
-				} else if(!($(this).hasClass('oc'))) {
-					$(this).html('');
-				}
-			});
-			newRow.insertAfter($(this));
+		if (!resRow.querySelector('td')?.querySelector('a')) {
+			continue;
 		}
-	});
+		const potentialPoints = [];
+		qCounter = 0;
+		// go through user's results and add up potential money values for each correct answer
+		for (const resCell of resRow.childNodes) {
+			if (resCell.classList.contains('bb')) {
+				if (resCell.classList.contains('omg')) {
+					const selected = resCell.classList.contains('u');
+					potentialPoints.push({
+						q: qCounter,
+						points: 15 + qPcts[qCounter],
+						selected
+					});
+				}
+				qCounter++;
+			}
+		}
+		potentialPoints.sort((a, b) => (b.points !== a.points ? b.points - a.points : b.sel - a.sel));
+		let bestQs = new Array();
+		let bestQsPoints = new Array();
+		let bestScore = 0;
 
+		// calculate best possible score and store best five questions for later
+		for (let iter = 0; iter < potentialPoints.length; iter++) {
+			if (iter < 5) {
+				bestQs.push(potentialPoints[iter].q);
+				bestScore += potentialPoints[iter].points;
+				bestQsPoints[potentialPoints[iter].q] = potentialPoints[iter].points;
+			} else {
+				bestScore += 15;
+			}
+		}
+
+		const newRow = resRow.cloneNode(true);
+		qCounter = 0;
+		let doneTot = false;
+		newRow.classList.add('llext');
+		for (const newCell of newRow.childNodes) {
+			if (newCell.classList.contains('bb')) {
+				if (bestQs.includes(qCounter)) {
+					createComparisonCell(newCell, bestQsPoints[qCounter]);
+				} else if (newCell.classList.contains('u')) {
+					setCell(newCell, ['llext-worse'], 15);
+				}
+				qCounter++;
+			}
+			else if (newCell.classList.contains('ot') && !doneTot) {
+				createComparisonCell(newCell, bestScore);
+				doneTot = true;
+			} else if (!(newCell.classList.contains('oc'))) {
+				newCell.replaceChildren();
+			}
+		}
+		resRow.after(newRow);
+	}
+}
+
+function createComparisonCell(cell, comparePoints) {
+	const cellPoints = Number(cell.textContent);
+	const classList = ['llext-best'];
+	if (comparePoints > cellPoints) {
+		classList.push('llext-better');
+	}
+	setCell(cell, classList, comparePoints);
+}
+
+function setCell(cell, classList, contents) {
+	const cellSpan = document.createElement('span');
+	cellSpan.textContent = contents;
+	for (const cl of classList) {
+		cellSpan.classList.add(cl);
+	}
+	cell.replaceChildren(cellSpan);
 }
