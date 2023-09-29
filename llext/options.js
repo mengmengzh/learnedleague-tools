@@ -3,7 +3,7 @@ function save_options() {
   let doAll = document.getElementById('doAll').value;
   chrome.storage.local.set({
     doAll: doAll
-  }, function() {
+  }, function () {
     // Update status to let user know options were saved.
   });
 }
@@ -13,11 +13,11 @@ function save_options() {
 function restore_options() {
   // Use default value color = 'red' and likesColor = true.
   chrome.storage.local.get({
-    doAll: 0 
-  }, function(items) {
+    doAll: 0
+  }, function (items) {
     document.getElementById('doAll').value = items.doAll;
   });
 }
 document.addEventListener('DOMContentLoaded', restore_options);
 document.getElementById('doAll').addEventListener('change',
-    save_options);
+  save_options);
